@@ -25,7 +25,7 @@
 		\subsection{Introduzione}
 
 			\subsubsection{Hardware di Base}
-				La Memoria consiste in un array di byte identificati da un indirizzo. 
+				La Memoria consiste in un array di byte identificati da un indirizzo.
 				\\La CPU può accedere solamente alla \textbf{Memoria Centrale} (RAM) e ai \textbf{Registri}, ma non al \textbf{Disco}. Quindi, tutte le istruzioni in esecuzione e i dati che utilizzano devono essere caricati in Memoria prima che la CPU possa operare su essi.
 				\\I Registri hanno una memoria molto piccola e veloce ed è possibile accedervi con un solo colpo di clock. Invece, per accedere alla Memoria sono necessari più colpi di ck e questo può causare \textit{stalli}. Per migliorare la situazione sono state introdotte le \textbf{Cache}: buffer di memoria veloce che si trovano nel processore e permettono di non accedere in memoria (se possiedono i dati cercati).
 				\\Un problema da gestire è quello di permettere ad un processo di accedere solo alla memoria per la quale è autorizzato. Per farlo si usano solitamente implementazioni hw, perché il SO non interviene negli accessi della CPU alla memoria per motivi di prestazioni.

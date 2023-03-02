@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.16)  2 MAR 2023 13:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.16)  2 MAR 2023 13:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Appunti/OS-Internals/Programmazione di Sistema (OS Internals).tex"
-(c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Appunti/OS-Internals/Programmazione di Sistema (OS Internals).tex
+**"c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/OS-Internals/Programmazione di Sistema (OS Internals).tex"
+(c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/OS-Internals/Programmazione di Sistema (OS Internals).tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2023-02-02> (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
@@ -348,12 +348,12 @@ Package pdftex.def Info: ch9_22.png  used on input line 249.
  [17 <./ch9_20.png> <./ch9_21.png>] [18 <./ch9_22.png>] [19] (Programmazione di Sistema (OS Internals).aux) ) 
 Here is how much of TeX's memory you used:
  5535 strings out of 476374
- 93077 string characters out of 5788854
+ 93013 string characters out of 5788854
  1860340 words of memory out of 5000000
  25868 multiletter control sequences out of 15000+600000
  518351 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 67i,7n,77p,1437b,282s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 67i,7n,77p,1429b,282s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Admin\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
 Output written on "Programmazione di Sistema (OS Internals).pdf" (19 pages, 795701 bytes).
 PDF statistics:
