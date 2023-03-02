@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.16)  27 FEB 2023 19:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 23.1) (preloaded format=pdflatex 2023.2.16)  2 MAR 2023 13:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Programmazione di Sistema (OS Internals).tex"
-(c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Programmazione di Sistema (OS Internals).tex
+**"c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Appunti/OS-Internals/Programmazione di Sistema (OS Internals).tex"
+(c:/Users/Admin/Desktop/Manuel/Poli/Programmazione di Sistema/OS Internals/Appunti/OS-Internals/Programmazione di Sistema (OS Internals).tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2023-02-02> (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
@@ -257,19 +257,107 @@ File: ch9_5.png Graphic file (type png)
 <use ch9_5.png>
 Package pdftex.def Info: ch9_5.png  used on input line 95.
 (pdftex.def)             Requested size: 276.79776pt x 85.36278pt.
- [7 <./ch9_4.png> <./ch9_5.png>] [8] (Programmazione di Sistema (OS Internals).aux) ) 
+ [7 <./ch9_4.png> <./ch9_5.png>] [8]
+<ch9_6.png, id=39, 345.08925pt x 192.11775pt>
+File: ch9_6.png Graphic file (type png)
+<use ch9_6.png>
+Package pdftex.def Info: ch9_6.png  used on input line 126.
+(pdftex.def)             Requested size: 332.21393pt x 184.94981pt.
+<ch9_8.png, id=40, 192.11775pt x 44.5665pt>
+File: ch9_8.png Graphic file (type png)
+<use ch9_8.png>
+Package pdftex.def Info: ch9_8.png  used on input line 131.
+(pdftex.def)             Requested size: 159.46355pt x 36.99153pt.
+<ch9_9.png, id=41, 265.59225pt x 331.83975pt>
+File: ch9_9.png Graphic file (type png)
+<use ch9_9.png>
+Package pdftex.def Info: ch9_9.png  used on input line 137.
+(pdftex.def)             Requested size: 136.63765pt x 170.71962pt.
+ [9 <./ch9_6.png>] [10 <./ch9_8.png> <./ch9_9.png>]
+<ch9_10.png, id=50, 476.37975pt x 127.677pt>
+File: ch9_10.png Graphic file (type png)
+<use ch9_10.png>
+Package pdftex.def Info: ch9_10.png  used on input line 153.
+(pdftex.def)             Requested size: 286.64417pt x 76.82498pt.
+<ch9_12.png, id=51, 280.6485pt x 210.7875pt>
+File: ch9_12.png Graphic file (type png)
+<use ch9_12.png>
+Package pdftex.def Info: ch9_12.png  used on input line 162.
+(pdftex.def)             Requested size: 189.41672pt x 142.26578pt.
+ [11 <./ch9_10.png> <./ch9_12.png>]
+<ch9_11.png, id=55, 349.90726pt x 179.4705pt>
+File: ch9_11.png Graphic file (type png)
+<use ch9_11.png>
+Package pdftex.def Info: ch9_11.png  used on input line 167.
+(pdftex.def)             Requested size: 221.88963pt x 113.80913pt.
+ [12 <./ch9_11.png>]
+<ch9_13.png, id=59, 343.2825pt x 295.70474pt>
+File: ch9_13.png Graphic file (type png)
+<use ch9_13.png>
+Package pdftex.def Info: ch9_13.png  used on input line 181.
+(pdftex.def)             Requested size: 214.6977pt x 184.94133pt.
+ [13 <./ch9_13.png>]
+<ch9_14.png, id=64, 578.76225pt x 364.9635pt>
+File: ch9_14.png Graphic file (type png)
+<use ch9_14.png>
+Package pdftex.def Info: ch9_14.png  used on input line 192.
+(pdftex.def)             Requested size: 293.2838pt x 184.94273pt.
+ [14 <./ch9_14.png>]
+<ch9_15.png, id=69, 311.9655pt x 324.61275pt>
+File: ch9_15.png Graphic file (type png)
+<use ch9_15.png>
+Package pdftex.def Info: ch9_15.png  used on input line 209.
+(pdftex.def)             Requested size: 164.06519pt x 170.71648pt.
+<ch9_16.png, id=70, 211.992pt x 44.5665pt>
+File: ch9_16.png Graphic file (type png)
+<use ch9_16.png>
+Package pdftex.def Info: ch9_16.png  used on input line 213.
+(pdftex.def)             Requested size: 162.42241pt x 34.1456pt.
+<ch9_17.png, id=71, 268.6035pt x 65.043pt>
+File: ch9_17.png Graphic file (type png)
+<use ch9_17.png>
+Package pdftex.def Info: ch9_17.png  used on input line 219.
+(pdftex.def)             Requested size: 152.7572pt x 36.99052pt.
+<ch9_18.png, id=72, 318.59026pt x 61.4295pt>
+File: ch9_18.png Graphic file (type png)
+<use ch9_18.png>
+Package pdftex.def Info: ch9_18.png  used on input line 223.
+(pdftex.def)             Requested size: 191.84106pt x 36.99013pt.
+ [15 <./ch9_15.png> <./ch9_16.png> <./ch9_17.png>]
+<ch9_19.png, id=76, 452.28975pt x 248.127pt>
+File: ch9_19.png Graphic file (type png)
+<use ch9_19.png>
+Package pdftex.def Info: ch9_19.png  used on input line 231.
+(pdftex.def)             Requested size: 259.31924pt x 142.263pt.
+<ch9_20.png, id=77, 395.67825pt x 274.02374pt>
+File: ch9_20.png Graphic file (type png)
+<use ch9_20.png>
+Package pdftex.def Info: ch9_20.png  used on input line 239.
+(pdftex.def)             Requested size: 205.42784pt x 142.26738pt.
+<ch9_21.png, id=78, 566.115pt x 273.4215pt>
+File: ch9_21.png Graphic file (type png)
+<use ch9_21.png>
+Package pdftex.def Info: ch9_21.png  used on input line 243.
+(pdftex.def)             Requested size: 294.5629pt x 142.2676pt.
+ [16 <./ch9_18.png> <./ch9_19.png>]
+<ch9_22.png, id=82, 370.986pt x 281.853pt>
+File: ch9_22.png Graphic file (type png)
+<use ch9_22.png>
+Package pdftex.def Info: ch9_22.png  used on input line 249.
+(pdftex.def)             Requested size: 187.2587pt x 142.26797pt.
+ [17 <./ch9_20.png> <./ch9_21.png>] [18 <./ch9_22.png>] [19] (Programmazione di Sistema (OS Internals).aux) ) 
 Here is how much of TeX's memory you used:
- 5421 strings out of 476374
- 91287 string characters out of 5788854
+ 5535 strings out of 476374
+ 93077 string characters out of 5788854
  1860340 words of memory out of 5000000
- 25770 multiletter control sequences out of 15000+600000
+ 25868 multiletter control sequences out of 15000+600000
  518351 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 67i,7n,77p,1149b,280s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\Admin\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on "Programmazione di Sistema (OS Internals).pdf" (8 pages, 238321 bytes).
+ 67i,7n,77p,1437b,282s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\Admin\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on "Programmazione di Sistema (OS Internals).pdf" (19 pages, 795701 bytes).
 PDF statistics:
- 69 PDF objects out of 1000 (max. 8388607)
+ 135 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

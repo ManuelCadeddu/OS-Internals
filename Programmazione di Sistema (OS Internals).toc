@@ -11,3 +11,15 @@
 \contentsline {subsection}{\numberline {1.2}Allocazione Contigua della Memoria}{7}{}%
 \contentsline {subsubsection}{\numberline {1.2.1}Allocazione della Memoria}{7}{}%
 \contentsline {subsubsection}{\numberline {1.2.2}Frammentazione}{8}{}%
+\contentsline {subsection}{\numberline {1.3}Paginazione}{9}{}%
+\contentsline {subsubsection}{\numberline {1.3.1}Frammentazione Interna}{10}{}%
+\contentsline {subsubsection}{\numberline {1.3.2}Struttura Entry della Page Table}{11}{}%
+\contentsline {subsubsection}{\numberline {1.3.3}Protezione}{12}{}%
+\contentsline {subsubsection}{\numberline {1.3.4}Pagine Condivise}{13}{}%
+\contentsline {subsection}{\numberline {1.4}Struttura della Page Table}{14}{}%
+\contentsline {subsubsection}{\numberline {1.4.1}Paginazione Gerarchica}{15}{}%
+\contentsline {subsubsection}{\numberline {1.4.2}Hashed Page Table}{16}{}%
+\contentsline {subsubsection}{\numberline {1.4.3}Inverted Page Table}{17}{}%
+\contentsline {subsection}{\numberline {1.5}Swapping}{18}{}%
+\contentsline {subsubsection}{\numberline {1.5.1}Standard Swapping}{18}{}%
+\contentsline {subsubsection}{\numberline {1.5.2}Swapping in Sistemi Mobili}{19}{}%

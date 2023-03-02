@@ -112,6 +112,154 @@
 					\item \textbf{frammentazione esterna}: spazio libero in RAM tra i diversi processi;
 					\item \textbf{frammentazione interna}: memoria non occupata dal processo che però è stata allocata per esso.
 				\end{itemize}
+				La frammentazione esterna dipende dalla dimensione della memoria e da quella dei processi ma è generalmente abbastanza grave. Con l'algoritmo first-fit, per esempio, l'analisi statistica rivela che per \textit{n} blocchi, si perdono circa 0.5*\textit{n} blocchi (\textbf{regola del 50 per cento}), ovvero 1/3 della memoria non viene usato.
+				\\Un metodo per migliorare il problema della frammentazione esterna è quello della \textbf{compattazione}: si spostano i blocchi di memoria dedicati ai processi creando un unico grande blocco. Questo però non deve essere possibile solo in fase di assemblaggio o loading, ma anche mentre i processi sono in esecuzione (in READY). Quindi gli indirizzi devono essere rilocabili dinamicamente. Se lo sono, la rilocazione richiede solo lo spostamento del programma e dei dati, e quindi la modifica del registro di rilocazione in modo che possieda il nuovo Base Register. La compattazione può però generare il \textit{problema I/O}, ovvero se un processo viene spostato mentre è in WAIT, in attesa di un operazione di I/O, la scrittura/lettura può essere fatta nella porzione di memoria sbagliata. Per risolvere questo problema sono possibili due soluzioni: impedire lo spostamento di processi che stanno eseguendo operazioni I/O o utilizzare dei buffer del SO, non soggetti a reallocazione, come intermediari tra la memoria e i dispositivi I/O.
+				\\L'algoritmo di compattazione più semplice consiste nello spostare tutti i processi verso un'estremità della memoria e può essere assai oneroso. 
+				\\Altre due tecniche usate per evitare la frammentazione esterna sono la \textbf{segmentazione} e la \textbf{paginazione} (queste tecniche si possono combinare).
+
+		\subsection{Paginazione}
+			La paginazione è una tecnica che permette l'assegnazione di blocchi di memomoria non contigui ad un processo. La paginazione evita la frammentazione esterna e la necessità di compattare perché non c'è più il problema di avere blocchi di memoria di dimensioni variabili. 
+			\\Il metodo di base consiste nello suddividere la \underline{memoria fisica} in blocchi di dimensione fissa, chiamati \textbf{frame}, e la \underline{memoria logica} in blocchi della stessa dimensione (dei frame), detti \textbf{pagine}. Quando si deve eseguire un processo, si caricano le sue pagine nei frame disponibili, prendendole dalla memoria ausiliaria o dal file system. Questa tecnica fornisce grandi funzionalità. Per esempio, ora lo spazio degli indirizzi logici è totalmente separato dallo spazio degli indirizzi fisici e dunque un processo può avere uno spazio degli indirizzi logici a 64 bit anche se il sistema ha meno di $2^{64}$ byte di memoria fisica.
+			\\Gli indirizzi logici vengono divisi in \textbf{page number} (\textbf{p}) e \textbf{page offset} (\textbf{d} = displacement). Il \textit{page number} serve come indice per la \textbf{paging table}, contenente l'indice del frame, che viene usato per calcolare l'indirizzo fisico.
+			\\L'hardware di supporto è il seguente:
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=6.5cm,keepaspectratio]{ch9_6.png}}
+			\end{figure}
+			\\La dimensione di una pagina, così come quella di un frame, è definita dall’hardware ed è, in genere, una potenza di 2 compresa tra 512 byte e 1 Gb. La scelta di una potenza di 2 facilita la traduzione di un indirizzo logico nei corrispondenti numero e offset di pagina. Se la dimensione dello spazio degli indirizzi logici (dimensione memoria logica) è \textit{$2^{m}$} byte (servono indirizzi di \textit{m} bit per identificare un determinato byte) e la dimensione di una pagina è di \textit{$2^{n}$} byte (servono indirizzi di n bit per identificare un determinato byte), per identificare una pagina servono indirizzi di \textit{m} - \textit{n} bit ($2^{m}$/$2^{n}$ pagine).
+			\\L’indirizzo logico ha quindi la seguente forma:
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=1.3cm,keepaspectratio]{ch9_8.png}}
+			\end{figure}
+			\\dove \textit{p} è un indice della tabella delle pagine e
+			\textit{d} è l’offset all’interno della pagina.
+			\\Vediamo un esempio. Consideriamo la seguente memoria:
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=6cm,keepaspectratio]{ch9_9.png}}
+			\end{figure}
+			\\Possiamo osservare che: \textit{m} = 4, \textit{n} = 2 e che la memoria fisica può contenere 8 frame. Per ottenere l'indirizzo fisico si calcola \textit{f} moltiplicando il numero di pagina indicato nella tabella delle pagine per la dimensione della pagina e si somma \textit{d} al risutato.
+
+			\subsubsection{Frammentazione Interna}
+				Con la paginazione si evita la frammentazione esterna ma non quella interna. Infatti, poiché la dimensione dei processi solitamente non è un multiplo di quella dei frame, l'ultimo frame può essere riempito solo parzialmente:
+				\begin{itemize}
+					\item caso migliore: 0 byte;
+					\item caso peggiore: dim\_frame - 1 byte;
+					\item caso medio: dim\_frame/2;
+				\end{itemize}
+				Da queste considerazioni possiamo osservare che più le pagine sono piccole, minore è la frammentazione interna ma maggiore è la dimensione della page table. Attualmente la dimensione tipica delle pagine è compresa tra 4 e 8 KB.
+
+			\subsubsection{Struttura Entry della Page Table}
+				La entry di una Page Table mantiene le seguenti informazioni:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=2.7cm,keepaspectratio]{ch9_10.png}}
+				\end{figure}
+				\\Poiché la Page Table è troppo grande per essere nella CPU, viene memorizzata in RAM. Nella CPU sono invece presenti due registri:
+				\begin{itemize}
+					\item \textbf{Page-Table Base Register} (\textbf{PTBR}): indirizzo base della Page Table in RAM;
+					\item \textbf{Page-Table Length Register} (\textbf{PTLR}): dimensione della Page Table;
+				\end{itemize}
+				Notare che l'utilizzo di questa tecnica richiede due accessi a memoria per accedere all'istruzione/dato (uno per tradurre indirizzo logico in fisico e uno per eseguire l'operazione). Questo dimezza la velocità della memoria. Per risolvere questo problema può essere usata una cache ad accesso diretto (CAM o Memoria Associativa) detta \textbf{Translaction Lookaside Buffers} (\textbf{TLB}). La memoria associativa è progettata in modo che si possa effettuare ricerca in parallelo su tutte le entry e solo la entry che matcha (se presente e massimo una) produce l'output desiderato. Essendo una cache può esserci \textit{TLB miss} ma comunque migliora le prestazioni. 
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_12.png}}
+				\end{figure}
+				\newpage
+				\noindent La TLB è solitamente piccola, da 64 a 1024 entry.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4cm,keepaspectratio]{ch9_11.png}}
+				\end{figure}
+				\\Vediamo come può essere calcolato l'\textbf{Effective Access Time} (\textbf{EAT}): ipotizziamo di avere un \textit{hit ratio} dell'80\% e che il tempo di accesso alla memoria in caso di \textit{TLB hit} sia di 10 ns (quindi di 20 ns in caso di miss):
+				\begin{itemize}
+					\item EAT = 0.8 * 10 + 0.2 * 20 = 12 ns
+				\end{itemize}
+
+			\subsubsection{Protezione}
+				In un ambiente paginato, la protezione della memoria è assicurata dai \textbf{bit di protezione} associati a ogni frame; normalmente tali bit si trovano nella tabella delle pagine (e nella TLB) e sono usati, ad esempio, per determinare se una pagina si può leggere e scrivere oppure soltanto leggere. 
+				\\Quando si interroga la page table per calcolare l’indirizzo fisico, vengono controllati i bit di protezione per verificare che non si scriva in una pagina di sola lettura. Un tale tentativo causerebbe la generazione di un’eccezione hardware per il SO. Questo metodo si può facilmente estendere per fornire un livello di protezione più perfezionato aggiungendo bit.
+				\\Di solito si associa a ciascun elemento della tabella delle pagine un ulteriore bit, detto \textbf{bit di validità}. Tale bit, impostato a valido, indica che la pagina corrispondente è nello spazio d’indirizzi logici del processo, quindi è una pagina valida. Il bit di validità consente quindi di riconoscere gli indirizzi illegali e di notificarne la presenza attraverso un’eccezione.
+				\newpage
+				\noindent Per esempio, supponiamo che in un sistema con uno spazio di indirizzi di 14 bit (da 0 a 16.383) si abbia un programma che deve usare soltanto gli indirizzi da 0 a 10.468 e che le pagine sono di 2 kB.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=6.5cm,keepaspectratio]{ch9_13.png}}
+				\end{figure}
+				\\Gli indirizzi nelle pagine 0, 1, 2, 3, 4 e 5 sono tradotti normalmente tramite la tabella delle pagine. D’altra parte, ogni tentativo di generare un indirizzo nelle pagine 6 o 7 trova il bit di validità non valido; in questo caso il calcolatore invia un’eccezione al sistema operativo (riferimento di pagina non valido).
+				\\Questo schema ha creato un problema: poiché il programma si estende solo fino all’indirizzo 10.468, ogni riferimento oltre tale indirizzo è illegale; i riferimenti alla pagina 5 sono tuttavia classificati come validi, e ciò rende validi gli accessi sino all’indirizzo 12.287; solo gli indirizzi da 12.288 a 16.383 sono non validi. Tale problema è dovuto alla dimensione delle pagine di 2 kb e corrisponde alla frammentazione interna della paginazione.
+			
+			\subsubsection{Pagine Condivise}
+				Un altro vantaggio della paginazione consiste nella possibilità di condividere pagine  tra processi, con conseguente risparmio di RAM.
+				\\Se una pagina di codice (es. funzione di libreria) deve essere condivisa, deve contenere \textbf{codice rientrante}. Il codice rientrante non cambia durante l’esecuzione. Quindi, due o più processi possono eseguirlo nello stesso momento. I dati usati da queste funzioni sono invece tipicamente privati.
+				\\Si consideri un sistema con 40 utenti, ciascuno dei quali usa un text editor. Se tale programma è formato da 150 kb di codice e 50 kB di spazio di dati, per gestire i 40 utenti sono necessari 8000 kB. Se invece il codice viene condiviso sono necessari solo 2150 kB.
+				\newpage
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=6.5cm,keepaspectratio]{ch9_14.png}}
+				\end{figure}
+				\noindent Il codice condiviso è read-only ma possono essere condivise anche pagine di dati read/write per permettere la comunicazione tra processi.
+
+		\subsection{Struttura della Page Table}
+			La tabella delle pagine potrebbe diventare enorme. Considerariamo ad esempio uno spazio di indirizzamento logico a 32 bit e pagine di 4kB. La tabella delle pagine dovrebbe avere circa 1 milione di entry ($2^{32}/2^{12}$) e, se ogni entry è di 4 B, ogni processo occuperebbe 4 MB di memoria fisica solo per essa. Inoltre, bisogna notare che la memoria occupata dovrebbe essere contigua perché la tabella viene usata come un array ad accesso diretto.
+			\\Quello che vogliamo fare è  eliminare il problema della contiguità della memoria. Vediamo alcune delle tecniche più comuni usate per strutturare la tabella delle pagine:
+			\begin{itemize}
+				\item \textbf{paginazione gerarchica};
+				\item \textbf{hashed page table};
+				\item \textbf{inverted page table}.
+			\end{itemize}
+
+			\newpage
+			\subsubsection{Paginazione Gerarchica}
+				La paginazione gerarchica è una soluzione semplice per evitare di collocare la page table in modo contiguo in RAM. Questo metodo consiste nell’adottare un algoritmo di paginazione a più livelli, in cui la tabella stessa è paginata. 
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=6cm,keepaspectratio]{ch9_15.png}}
+				\end{figure}
+				\\Si consideri l'esempio di macchina a 32 bit con dimensione delle pagine di 4 kB ed entry nella page table di 4 byte. Ciascun indirizzo logico è suddiviso in un numero di pagina di 20 bit e in un offset di pagina di 12. Paginando la tabella delle pagine (4 MB in pagine da 4 kB), anche il numero di pagina è suddiviso in un numero di pagina di 10 bit e un offset di 10 (una entry occupa 4 byte, quindi non c'è bisogno di accedere a ogni byte ma ad uno ogni 4).
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1.2 cm,keepaspectratio]{ch9_16.png}}
+				\end{figure}
+				\\Poiché la traduzione degli indirizzi si svolge dalla tabella esterna delle pagine verso l’interno, questo metodo è anche noto come \textbf{tabella delle pagine ad associazione diretta} (\textbf{forward-mapped page table}).
+				\\Tra gli svantaggi che possiamo notare c'è la maggiore occupazione di memoria (overhead) e il dover effettuare un ulteriori accessi all a RAM.
+				\\La paginazione a due livelli non è adatta per sistemi con uno spazio di indirizzi logici a 64 bit. Si supponga che la dimensione delle pagine di questo sistema sia di 4 kB. In questo caso, la tabella delle pagine conterrà fino a $2^{52}$ elementi. Adottando uno schema di paginazione a due livelli, le page table interne possono occupare una pagina, o contenere $2^{10}$ elementi di 4 byte. 
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1.3cm,keepaspectratio]{ch9_17.png}}
+				\end{figure}
+				\\La page table esterna è di $2^{42}$ elementi. La soluzione per evitare una tabella tanto grande consiste nel suddividerla in parti più piccole. Per esempio, si può paginare ottenendo uno schema di paginazione a tre livelli. Si supponga che la tabella esterna delle pagine sia costituita di pagine di dimensione ordinaria ($2^{10}$ elementi, o $2^{12}$ byte); uno spazio d’indirizzi a 64 bit è ancora enorme:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1.3cm,keepaspectratio]{ch9_18.png}}
+				\end{figure}
+				\\Il passo successivo sarebbe uno schema di paginazione a quattro livelli, in cui si pagina anche la tabella esterna di secondo livello delle pagine, e così via.
+
+			\subsubsection{Hashed Page Table}
+				Un metodo per gestire spazi d’indirizzi oltre i 32 bit consiste nell’impiego di una hash table, in cui l’argomento della funzione hash è il numero della pagina virtuale. Ogni elemento della tabella contiene una lista concatenata di elementi che la funzione di hash fa corrispondere alla stessa locazione ed è composto da tre campi: (1) numero della pagina virtuale, (2) indirizzo del frame corrispondente alla pagina virtuale e (3) puntatore al successivo elemento della lista.
+				\\Algoritmo: si applica la funzione hash al numero della pagina virtuale contenuto nell’indirizzo virtuale, identificando un elemento della tabella. Si confronta il numero di pagina virtuale con il campo (1) del primo elemento della lista concatenata: se i valori coincidono, si usa il campo 2 per generare l’indirizzo fisico altrimenti, vengono esaminati gli elementi successivi.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_19.png}}
+				\end{figure}
+				\\Per questo schema è stata proposta una variante: la \textbf{page table a gruppi} (\textbf{clustered page table}), simile alla hash page table ma ciascun elemento della hash table contiene i riferimenti alle pagine fisiche corrispondenti a un gruppo di pagine virtuali contigue (per esempio 16). Queste tabelle sono particolarmente utili per gli spazi d’indirizzi sparsi, in cui i riferimenti alla memoria non sono contigui.
+
+			\subsubsection{Inverted Page Table}
+				Generalmente, si associa una tabella delle pagine a ogni processo e tale tabella contiene un elemento per ogni pagina virtuale che il processo sta usando. Uno degli inconvenienti di questo metodo è che ciascuna page table può occupare grandi quantità di memoria fisica.
+				\\Per risolvere questo problema si può fare uso della tabella delle pagine invertita. Una inverted page table ha un elemento per ogni frame. Ciascun elemento è costituito dell’indirizzo virtuale della pagina memorizzata in quella reale locazione di memoria (\textit{p}) e dal \textit{pid} del processo che possiede tale pagina (perché processi diversi possono usare lo stesso \textit{p}). Quindi, nel sistema esiste una sola tabella delle pagine che ha un solo elemento per ciascuna pagina di memoria fisica. Se avviene il match con l'\textit{i-esima} entri, \textit{i} corrisponde all'indirizzo fisico.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_20.png}}
+				\end{figure}
+				\\I vantaggi di questa tecnica sono che la page table ha dimensione minori (dipenda dal numero di frame, non dalla dimensione dello spazio di indirizzamenti virtuale) e che c'è una unica tabella per tutti i processi (ogni frame è associato a un solo processo). Lo svantaggio è che non si ha accesso diretto (serve ricerca) e questo causa rallentamenti. Per eliminare questo problema le IPT sono associate a tabelle di hash.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_21.png}}
+				\end{figure}
 				
+		\subsection{Swapping}
+			Per essere eseguito, un processo deve trovarsi in RAM. Tuttavia, può essere temporaneamente tolto da essa (\textbf{swap/roll out}), essere spostato in una memoria ausiliaria (\textbf{backing store}) e in seguito riportato in memoria per continuare (\textbf{swap/roll in}) l’esecuzione. Questo procedimento si chiama avvicendamento dei processi in memoria (swapping). Grazie allo swapping lo spazio degli indirizzi fisici di tutti i processi può eccedere la reale dimensione della memoria fisica del sistema, aumentando il grado di multiprogrammazione possibile.
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_22.png}}
+			\end{figure}
+
+			\subsubsection{Standard Swapping}
+				L’avvicendamento standard riguarda lo spostamento dei processi tra la RAM e backing store, di solito costituita da un disco veloce. Tale memoria deve essere abbastanza ampia da contenere le copie di tutte le immagini di memoria di tutti i processi utenti, e deve permettere un accesso diretto ad esse. Il sistema mantiene una coda dei processi pronti (\textit{ready queue}) formata dai processi pronti per l’esecuzione. Quando lo scheduler decide di eseguire un processo, richiama il dispatcher, che controlla se il primo processo della coda si trova in memoria centrale. Se non c'è, e in questa non c’è spazio libero, il dispatcher scarica un processo dalla memoria e vi carica il processo richiesto dallo scheduler, quindi ricarica i registri e trasferisce il controllo al processo selezionato.
+				\\In un tale sistema d’avvicendamento, il tempo di context-switching è piuttosto elevato. Si pensi a un processo di 100 MB e a una memoria ausiliaria costituita da un normale hard disk con velocità di trasferimento di 50 MB al secondo. Il trasferimento del processo richiede: 100 MB / 50 MB al secondo = 2 secondi. Dal momento che dobbiamo scaricare e poi ricaricare il processo, il tempo totale è di circa 4 s.
+				\\Occorre notare che la maggior parte del tempo d’avvicendamento è data dal tempo di trasferimento e che questo è direttamente proporzionale alla quantità di memoria trasferita. Perciò sarebbe utile sapere quanta memoria sia effettivamente usata da un processo e non solo quanta questo potrebbe usarne, poiché in questo caso è necessario trasferire solo quanto è effettivamente utilizzato, riducendo il tempo d’avvicendamento (\textbf{swapping con paging}). 
+				\\Per scaricare un processo dalla memoria è necessario essere certi che sia completamente inattivo. Particolare importanza ha l’attesa di I/O: quando decidiamo di scaricare un processo per liberare la memoria, tale processo può essere nell’attesa del completamento di un’operazione di I/O. Tuttavia, se un dispositivo di I/O accede in modo asincrono alle aree di I/O della memoria (buffer) utente, il processo non può essere scaricato. Si supponga che l’operazione di I/O sia stata accodata, perché il dispositivo era occupato. Se il processo P2 s’avvicendasse al processo P1, l’operazione di I/O potrebbe tentare di usare la memoria che attualmente appartiene al processo P2. Questo problema si può risolvere in due modi: non scaricando dalla memoria un processo con operazioni di I/O pendenti, oppure eseguendo operazioni di I/O solo in buffer del SO. Trasferimenti fra tali aree del sistema operativo e la memoria assegnata al processo possono poi avvenire solo quando il processo è presente in RAM. Si noti che questo meccanismo di memorizzazione (\textbf{double buffering}) aggiunge overhead. Abbiamo infatti bisogno di copiare nuovamente i dati, dalla memoria del kernel alla memoria utente, prima che il processo utente possa accedervi.
+				\\Attualmente l’avvicendamento nella sua forma standard si usa in pochi sistemi; richiede infatti un elevato tempo di trasferimento, e consente un tempo di esecuzione troppo breve per essere considerato una soluzione ragionevole al problema di gestione della memoria.
+
+			\subsubsection{Swapping in Sistemi Mobili}
+				Mentre la maggior parte dei SO per PC e server supporta qualche versione di swapping, i sistemi mobili in genere non ne supportano. Questi utilizzano solitamente, come memoria di massa, la memoria flash al posto dei dischi rigidi, più voluminosi. Il vincolo che ne deriva in termini di spazio è una delle ragioni per cui si evitalo swapping dei processi. Inoltre, vi sono il numero limitato di scritture che una memoria flash può sopportare prima di diventare inaffidabile e il trasferimento tra memoria centrale e memoria flash è lento.
+				\\Invece di usare lo swapping, se la memoria disponibile scende al di sotto di una certa soglia, iOS di Apple chiede alle applicazioni di rinunciare volontariamente alla memoria allocata. I dati di sola lettura vengono rimossi dal sistema e successivamente ricaricati dalla memoria flash, se necessario. I dati che sono stati modificati (per esempio lo stack) non vengono rimossi. Tuttavia, tutte le applicazioni che non riescono a liberare memoria a sufficienza possono essere terminate dal SO.
+				\\Android non supporta l’avvicendamento e adotta una strategia simile a quella di iOS. Anche Android può terminare un processo qualora la memoria libera disponibile non sia sufficiente. Tuttavia, prima di terminarlo, scrive lo stato dell’applicazione nella memoria flash, in modo che il processo possa essere rapidamente riavviato.
+		
 
 \end{document}
