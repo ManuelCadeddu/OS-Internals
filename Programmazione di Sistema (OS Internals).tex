@@ -29,7 +29,7 @@
 				\\La CPU può accedere solamente alla \textbf{Memoria Centrale} (RAM) e ai \textbf{Registri}, ma non al \textbf{Disco}. Quindi, tutte le istruzioni in esecuzione e i dati che utilizzano devono essere caricati in Memoria prima che la CPU possa operare su essi.
 				\\I Registri hanno una memoria molto piccola e veloce ed è possibile accedervi con un solo colpo di clock. Invece, per accedere alla Memoria sono necessari più colpi di ck e questo può causare \textit{stalli}. Per migliorare la situazione sono state introdotte le \textbf{Cache}: buffer di memoria veloce che si trovano nel processore e permettono di non accedere in memoria (se possiedono i dati cercati).
 				\\Un problema da gestire è quello di permettere ad un processo di accedere solo alla memoria per la quale è autorizzato. Per farlo si usano solitamente implementazioni hw, perché il SO non interviene negli accessi della CPU alla memoria per motivi di prestazioni.
-				\\Una tecnica per implementare questa protezione è quella di avere due registri nella CPU: il \textbf{Base Register} e il \textbf{Limit Register}. Il Base Register contiene l'indirizzo minimo accedibile dal processo, il Limit Register la porzione di memoria assegnata al processo e, insieme, definiscono lo spazio degli \textit{Indirizzi Logici}. Quando la CPU deve accedere alla memoria verifica che l'indirizzo sia compreso tra il Base e Base + Limit. Se un processo cerca di accedere a un indirizzo non valido, viene generata una \textit{trap} che restituisce il controllo al SO per gestirla.
+				\\Una tecnica per implementare questa protezione è quella di avere due registri nella CPU: il \textbf{Base Register} e il \textbf{Limit Register}. Il Base Register contiene l'indirizzo minimo accedibile dal processo, il Limit Register la porzione di memoria assegnata al processo. Quando la CPU deve accedere alla memoria verifica che l'indirizzo sia compreso tra Base e Base + Limit. Se un processo cerca di accedere a un indirizzo non valido, viene generata una \textit{trap} che restituisce il controllo al SO per gestirla.
 				\begin{figure}[ht!]
 					\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_1.png}}
 				\end{figure}
@@ -55,21 +55,20 @@
 				\\Esistono tre tipi di address binding:
 				\begin{itemize}
 					\item \textbf{Compile Time Address Binding}: se il compilatore sa dove il processo risiederà in memoria, può generare \textbf{codice assoluto}. In questo caso, se dovesse cambiare la locazione iniziale, bisognerebbe ricompilare il codice;
-					\item \textbf{Load Time Address Binding}: se in fase di compilazione non è possibile sapere in che punto della memoria risiederà il processo, il compilatore genera \textbf{codice rilocabile}. In questo caso il \textit{codice assoluto} viene generato in fase di caricamento e, se cambia l'indirizzo del processo, è sufficiente ricaricare il codice per ottenere il nuovo indirizzo "base";
+					\item \textbf{Load Time Address Binding}: se in fase di compilazione non è possibile sapere in che punto della memoria risiederà il processo, il compilatore genera \textbf{codice rilocabile}. Nel Load Time Address Binding il \textit{codice assoluto} viene generato in fase di caricamento e, se cambia l'indirizzo del processo, è sufficiente ricaricare il codice per ottenere il nuovo indirizzo "base";
 					\item \textbf{Execution Time Address Binding}: se durante l'esecuzione il processo può essere spostato in memoria, si deve ritardare la generazione degli \textit{indirizzi assoluti} fino alla fase di esecuzione. La maggior parte dei SO usa questa soluzione.
 				\end{itemize}
 		
 			\subsubsection{Spazi di Indirizzi Logici e Fisci}
-				Un indirizzo generato dalla CPU è normalmente chiamato \textbf{indirizzo logico}, mentre quello caricato nel rigistro dell'indirizzo di memoria è chiamato \textbf{indirizzo fisico}.	
-				\\I metodi di associazione degli indirizzi in fase di compilazione e di caricamento producono indirizzi logici e fisici identici. Con l'associazione in fase di esecuzione gli indirizzi logici non coincidono con quelli fisici. In questo caso ci si riferisce agli indirizzi logici col termine \textbf{indirizzi virtuali}.
-				\\L'insieme degli indirizzi logici generati da un programma è lo \textbf{spazio degli indirizzi logici}; l'insieme degli indirizzi fisici corrispondenti a tali indirizzi logici è lo \textbf{spazio degli indirizzi fisci}.
-				\\Per implementare l'Execution Time Address Binding,  l'associazione dagli indirizzi virtuali a quelli fisici è svolta da un dispositivo (interno alla CPU) detto \textbf{MMU} (\textbf{Memory Management Unit}). Come vedremo più avanti, questo binding può essere realizzato in diversi modi. Per esempio, sommando l'indirizzo logico al contenuto del registro base (ora chimato \textbf{relocation register}).
+				Un indirizzo generato dalla CPU è normalmente chiamato \textbf{indirizzo logico}, mentre quello caricato nel MAR (Memory Address Register) è chiamato \textbf{indirizzo fisico}. Le tecniche di binding degli indirizzi in fase di compilazione e di caricamento producono indirizzi logici e fisici identici, quella in fase di esecuzione no. In questo caso ci si riferisce agli indirizzi logici col termine \textbf{indirizzi virtuali}.
+				\\L'insieme degli indirizzi logici generati da un programma forma lo \textbf{spazio degli indirizzi logici}; l'insieme degli indirizzi fisici corrispondenti a tali indirizzi logici è lo \textbf{spazio degli indirizzi fisci}.
+				\\Per implementare l'Execution Time Address Binding,  l'associazione dagli indirizzi virtuali a quelli fisici è svolta da un dispositivo interno alla CPU: l'\textbf{MMU} (\textbf{Memory Management Unit}). Come vedremo più avanti, questo binding può essere realizzato in diversi modi. Per esempio, sommando l'indirizzo logico al contenuto del registro base (ora chimato \textbf{relocation register}).
 				\begin{figure}[ht!]
 					\centering{\includegraphics[width=12cm,height=3.5cm,keepaspectratio]{ch9_3.png}}
 				\end{figure}
 
 			\subsubsection{Dynamic Loading}
-				Nella discussione svolta fin’ora, era necessario che l’intero programma e i dati di un processo fossero presenti nella memoria fisica perché il processo potesse essere eseguito. Per migliorare l’utilizzo della memoria si può ricorrere al \textbf{caricamento dinamico} (dynamic loading), mediante il quale si carica una procedura solo quando viene richiamata; tutte le procedure si tengono su disco in un formato di caricamento rilocabile. Si carica il programma principale in memoria e quando una procedura deve richiamarne un’altra, controlla innanzitutto che sia stata caricata. Se non è stata caricata, caricare in memoria la procedura richiesta e aggiornare le tabelle degli indirizzi del programma. A questo punto il controllo passa alla procedura appena caricata.
+				Nella discussione svolta fin’ora, era necessario che l’intero programma e i dati di un processo fossero in RAM perché il processo potesse essere eseguito. Per migliorare l’utilizzo della memoria si può ricorrere al \textbf{caricamento dinamico} (dynamic loading): prima di tutto si carica il programma principale in memoria e, quando una procedura ne richiama un’altra, innanzitutto si controlla che quella richiesta sia stata caricata. Se non lo è, viene caricata e vengono aggiornate le tabelle degli indirizzi del programma. A questo punto il controllo passa alla procedura appena caricata. Notare che tutte le procedure si tengono su disco in un formato di caricamento rilocabile.
 				\\Il caricamento dinamico non richiede un supporto particolare del SO. Spetta agli utenti progettare i programmi in modo da trarre vantaggio da un metodo di questo tipo. Il SO può tuttavia aiutare il programmatore fornendo librerie di procedure che realizzano il caricamento dinamico.
 			
 
@@ -260,6 +259,202 @@
 				Mentre la maggior parte dei SO per PC e server supporta qualche versione di swapping, i sistemi mobili in genere non ne supportano. Questi utilizzano solitamente, come memoria di massa, la memoria flash al posto dei dischi rigidi, più voluminosi. Il vincolo che ne deriva in termini di spazio è una delle ragioni per cui si evitalo swapping dei processi. Inoltre, vi sono il numero limitato di scritture che una memoria flash può sopportare prima di diventare inaffidabile e il trasferimento tra memoria centrale e memoria flash è lento.
 				\\Invece di usare lo swapping, se la memoria disponibile scende al di sotto di una certa soglia, iOS di Apple chiede alle applicazioni di rinunciare volontariamente alla memoria allocata. I dati di sola lettura vengono rimossi dal sistema e successivamente ricaricati dalla memoria flash, se necessario. I dati che sono stati modificati (per esempio lo stack) non vengono rimossi. Tuttavia, tutte le applicazioni che non riescono a liberare memoria a sufficienza possono essere terminate dal SO.
 				\\Android non supporta l’avvicendamento e adotta una strategia simile a quella di iOS. Anche Android può terminare un processo qualora la memoria libera disponibile non sia sufficiente. Tuttavia, prima di terminarlo, scrive lo stato dell’applicazione nella memoria flash, in modo che il processo possa essere rapidamente riavviato.
-		
 
+	\section{Memoria Virtuale}
+		
+		\subsection{Introduzione}
+			Nel precedente capitolo sono state esaminate varie strategie di gestione della memoria. Hanno tutte lo stesso scopo: tenere contemporaneamente più processi in memoria per permettere la multiprogrammazione; tuttavia esse tendono a richiedere che l’intero processo si trovi in memoria prima di essere eseguito.
+			\\La \textbf{memoria virtuale}, definisce una separazione tra gli indirizzi logici e fisici e solo una parte degli indirizzi logici sono mappati in quelli fisici (non viene caricato tutto il programma in RAM). Il vantaggio principale di questa tecnica è quello di permettere che i programmi siano più grandi della memoria fisica; inoltre la memoria virtuale astrae la memoria centrale in un vettore di memorizzazione molto grande e uniforme, separando la memoria logica, com’è vista dall’utente, da quella fisica. Questa tecnica libera i programmatori dai problemi di limitazione della memoria. Inoltre, permette l'esecuzione di più programi, ai processi di condividere facilmente file e di realizzare memorie condivise, e fornisce un meccanismo efficiente per la creazione dei processi. La memoria virtuale è però difficile da realizzare e, s’è usata scorrettamente, può ridurre di molto le prestazioni del sistema. 
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=4cm,keepaspectratio]{ch9_23.png}}
+			\end{figure}
+			\\L’espressione \textbf{spazio degli indirizzi virtuali} si riferisce alla collocazione dei processi in memoria dal punto di vista logico (o virtuale). Tipicamente, da tale punto di vista, un processo inizia in corrispondenza di un certo indirizzo logico (es. l’indirizzo 0) e si estende in uno spazio di memoria contigua.
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=3.5cm,keepaspectratio]{ch9_24.png}}
+			\end{figure}
+			\newpage
+			\noindent Come si ricorderà, è tuttavia possibile organizzare la memoria fisica in frame di pagine; in questo caso i frame delle pagine fisiche assegnati ai processi possono non essere contigui. Spetta alla MMU associare le pagine logiche a quelle fisiche.
+			\\Si noti come allo heap sia lasciato spazio per crescere verso l’alto nello spazio di memoria, poiché esso ospita la memoria allocata dinamicamente. In modo analogo, consentiamo allo stack di svilupparsi verso il basso quando vengono effettuate ripetute chiamate di funzione. Lo spazio vuoto (o buco) che separa lo heap dallo stack è parte dello spazio degli indirizzi virtuali, ma richiede pagine fisiche reali solo nel caso che lo heap o lo stack crescano. Uno spazio degli indirizzi virtuali che contiene buchi si definisce \textbf{sparso}. Un simile
+			spazio degli indirizzi è utile, poiché i buchi possono essere riempiti grazie all’espansione dei segmenti heap o stack, oppure se vogliamo collegare dinamicamente delle
+			librerie (o altri oggetti condivisi) durante l’esecuzione del programma.
+			\\Oltre a separare la memoria logica da quella fisica, la memoria virtuale offre il vantaggio di condividere i file e la memoria fra duo o più processi, mediante la condivisione delle pagine. 
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=4cm,keepaspectratio]{ch9_25.png}}
+			\end{figure}
+			\\Ciò comporta i seguenti vantaggi:
+			\begin{itemize}
+				\item le librerie di sistema sono condivisibili da diversi processi associando (“mappando”) l’oggetto di memoria condiviso a uno spazio degli indirizzi virtuali. Benché ciascun processo veda le librerie condivise come parte del proprio spazio degli indirizzi virtuali, le pagine che ospitano effettivamente le librerie nella memoria fisica sono in condivisione tra tutti i processi. In genere le librerie si associano allo spazio di ogni processo a loro collegato, in modalità di sola lettura;
+			   \item in maniera analoga, la memoria può essere condivisa tra processi distinti. Due o più processi possono comunicare condividendo memoria. La memoria virtuale permette a un processo di creare una regione di memoria condivisibile da un altro processo. I processi che condividono questa regione la considerano parte del proprio spazio degli indirizzi virtuali, malgrado le pagine fisiche siano, in realtà, condivise;
+			   \item Le pagine possono essere condivise durante la creazione di un processo mediante la chiamata di sistema \textit{fork()}, così da velocizzare la generazione dei processi.
+			\end{itemize}
+
+		\subsection{Paginazione su Richiesta (Demand Paging)}
+
+			La \textbf{paginazione su richiesta} è una tecnica che consiste nel caricare le pagine nel momento in cui servono realmente e che viene comunemente adottata dai sistemi con memoria virtuale. Un sistema di paginazione su richiesta è simile a un sistema paginato con avvicendamento dei processi in memoria (swapping). I processi risiedono in memoria secondaria e per eseguirli occorre caricarli in memoria. Tuttavia, anziché caricare l’intero processo, si esegue un avvicendamento “pigro” (\textbf{lazy swapping}): non si carica mai in memoria una pagina che non sia necessaria. Nell’ambito dei sistemi con paginazione su richiesta l’uso del termine "swapping" non è appropriato: uno swapper manipola interi processi mentre un \textbf{paginatore} (pager) gestisce le singole pagine dei processi.
+
+			\subsubsection{Concetti Fondamentali}
+				Quando un processo sta per essere caricato in memoria, il paginatore ipotizza quali pagine saranno usate prima che il processo sia nuovamente scaricato dalla memoria (swap in) e trasferisce in memoria (swap out) solo quest pagine. 
+				\\Con tale schema è necessario che l’hardware fornisca un meccanismo che distingue le pagine presenti in memoria da quelle nei dischi. A tal fine è utilizzabile un \textbf{bit di validità}: impostato come “valido” se la pagina corrispondente è valida ed è presente in memoria e come “non valido” se la pagina non è valida (cioè non appartiene allo spazio d’indirizzi logici del processo) oppure è valida ma è attualmente nel disco. L’elemento della tabella delle pagine di una pagina caricata in memoria s’imposta come al solito, mentre l’elemento della tabella delle pagine corrispondente a una pagina che attualmente non è in memoria è semplicemente contrassegnato come non valido oppure contiene l’indirizzo della pagina su disco.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=6.1cm,keepaspectratio]{ch9_26.png}}
+				\end{figure}
+				\\Occorre notare che indicare una pagina come non valida non sortisce alcun effetto se il processo non tenta mai di accedervi. Quindi, se l’ipotesi del paginatore è esatta e si caricano tutte e solo le pagine che servono  effettivamente, il processo è eseguito proprio come se fossero state caricate tutte le pagine. Durante  l’esecuzione, finchè il processo accede alle pagine \textbf{residenti in memoria}, l’esecuzione procede come di consueto.
+				\\L’accesso a una pagina contrassegnata come non valida causa un evento o eccezione di \textbf{page fault}. L’hardware di paginazione, traducendo l’indirizzo attraverso la tabella delle pagine, nota che il bit è non valido e genera una trap per il SO. La procedura di gestione dell’eccezione di page fault è la seguente:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=6.5cm,keepaspectratio]{ch9_27.png}}
+				\end{figure}
+				\begin{enumerate}
+					\item si controlla una tabella interna per il processo per stabilire se il riferimento fosse un accesso alla memoria valido o non valido;
+					\item se il riferimento non era valido, si termina il processo. Se era un riferimento valido, ma la pagina non era ancora stata portata in memoria, se ne effettua il caricamento;
+					\item si individua un frame libero, per esempio prelevandone uno dalla lista dei frame liberi;
+					\item si programma un’operazione sui dischi per trasferire la pagina desiderata nel frame appena assegnato;
+					\item quando la lettura dal disco è completata, si modificano la tabella interna, conservata con il processo, e la tabella delle pagine per indicare che la pagina si trova attualmente in memoria (bi di validità = 'v');
+					\item si riavvia l’istruzione interrotta dall’eccezione. A questo punto il processo può
+					accedere alla pagina come se questa fosse stata sempre presente in memoria.
+				\end{enumerate}
+				Il caso estremo, è l'avvio di un processo senza pagine in memoria. Quando il SO carica nel PC l’indirizzo della prima istruzione del processo, il processo genera immediatamente un page fault. Una volta portata la pagina in memoria, il processo continua l’esecuzione, generando page fault fino a che tutte le pagine necessarie non si trovino effettivamente in memoria; a questo punto si può eseguire il processo senza ulteriori richieste. Lo schema descritto è una \textbf{paginazione su richiesta pura} (una pagina non si trasferisce mai in memoria se non viene richiesta).
+				\\In teoria alcuni programmi possono accedere a diverse nuove pagine all’esecuzione di ogni istruzione (una pagina per l’istruzione e molte per i dati), eventualmente causando più page fault. In un caso simile le prestazioni del sistema sarebbero inaccettabili. Fortunatamente l’analisi dei programmi in esecuzione mostra che questo comportamento è estremamente improbabile perché i programmi tendono ad avere una \textbf{località dei riferimenti}.
+				\\L’hardware di supporto alla paginazione su richiesta è lo stesso che è richiesto per la paginazione e l’avvicendamento dei processi in memoria:
+				\begin{itemize}
+					\item \textbf{tabella delle pagine}: ha la capacità di contrassegnare un elemento come non valido attraverso un bit di validità oppure un valore speciale dei bit di protezione;
+					\item \textbf{memoria secondaria}: conserva le pagine non presenti in memoria centrale. Generalmente la memoria secondaria è costituita da un disco ad alta velocità detto dispositivo di swap; la sezione del disco usata a questo scopo si chiama \textbf{area di avvicendamento} (\textbf{swap space}).
+				\end{itemize}
+				Uno dei requisiti cruciali del Demand paging è la possibilità di rieseguire un'istruzione dopo un page fault. Avendo salvato lo stato del processo interrotto (registri, PC\dots) al momento del page fault, occorrerà riavviare il processo esattamente dallo stesso punto e con lo stesso stato, eccezion fatta per la presenza della pagina desiderata in memoria. Nella maggior parte dei casi questo requisito è facile da soddisfare. Un page fault si può verificare per qualsiasi riferimento alla memoria. Se si verifica durante la fase di fetch (prelievo) di un’istruzione, l’esecuzione si può riavviare effettuando nuovamente il fetch. Se si verifica durante il fetch di un operando, bisogna effettuare nuovamente fetch e decode dell’istruzione, quindi si può prelevare l’operando. Come caso limite si consideri un’istruzione a tre indirizzi, per esempio la somma (ADD) del contenuto di A al contenuto di B, con risultato posto in C. I passi necessari per eseguire l’istruzione sono i seguenti:
+				\begin{enumerate}
+					\item fetch e decodifica dell’istruzione (ADD);
+					\item prelievo del contenuto di A;
+					\item prelievo del contenuto di B;
+					\item addizione del contenuto di A al contenuto di B
+					\item memorizzazione della somma in C.
+				\end{enumerate}
+				Se il page fault avviene al momento della memorizzazione in C, poiché C si trova in una pagina che non è in memoria, occorre prelevare la pagina desiderata, caricarla in memoria, correggere la tabella delle pagine e riavviare l’istruzione. Il riavvio dell’istruzione richiede una nuova operazione di fetch, con nuova decodifica e nuovo prelievo dei due operandi; infine occorre ripetere l’addizione.
+
+			\subsubsection{Free-Frame List}
+				Quando si verifica un page fault, il SO deve trovare un frame libero dove allocare la pagina. Perché questa ricerca sia rapida, viene utililzzata una lista dei frame liberi (\textbf{free-frame list}).
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=0.7cm,keepaspectratio]{ch9_28.png}}
+				\end{figure}
+				\\I SO solitamente allocano i frame liberi usando una tecnica conosciuta come \textbf{zero-fill-on-demand}, ovvero i frame vengono riempiti di zeri prima di essere allocati.
+				\\Quando il sistema viene avviato, tutta la memoria disponibile appartiene alla free-frame list.
+
+			\subsubsection{Prestazioni del Demand Paging}
+				La paginazione su richiesta può avere un effetto rilevante sulle prestazioni. Il motivo si può comprendere calcolando il tempo d’accesso effettivo per una memoria con paginazione su richiesta. Attualmente, nella maggior parte dei calcolatori il tempo d’accesso alla memoria varia da 10 a 200 nanosecondi. Finché non si verifichino page fault, il tempo d’accesso effettivo è uguale al tempo d’accesso alla memoria. Se però si verifica un page fault, occorre prima leggere dal disco la pagina interessata e quindi accedere alla parola della memoria desiderata.
+				\\Supponendo che \textit{p} sia la probabilità che si verifichi un page fault (0 $<=$ p $<=$ 1), è probabile che \textit{p} sia molto vicina allo zero, cioè che ci siano solo pochi fault. Il tempo d’accesso effettivo è dato da:
+				\begin{center}
+					\textit{tempo d’accesso effettivo = (1 – p) – ma + p × tempo di gestione del page fault}
+				\end{center}
+				Per calcolare il tempo d’accesso effettivo occorre conoscere il tempo necessario alla gestione di un page fault. In tal caso si deve eseguire la seguente sequenza:
+				\begin{enumerate}
+					\item trap per il sistema operativo;
+					\item salvataggio dei registri utente e dello stato del processo;
+					\item verifica che l’interruzione sia dovuta o meno a un page fault;
+					\item . controllo della correttezza del riferimento alla pagina e determinazione della locazione della pagina nel disco;
+					\item lettura dal disco e trasferimento in un frame libero:
+					\begin{enumerate}
+						\item attesa nella coda relativa a questo dispositivo finché la richiesta di lettura non sia servita;
+						\item attesa del tempo di posizionamento e latenza del dispositivo;
+						\item inizio del trasferimento della pagina in un frame libero;
+					\end{enumerate}
+					\item durante l’attesa, allocazione della CPU a un altro processo utente (scheduling della CPU, facoltativo);
+					\item ricezione di un’interruzione dal controllore del disco (I/O completato);
+					\item salvataggio dei registri e dello stato dell’altro processo utente (se è stato eseguito il passo 6);
+					\item verifica della provenienza dell’interruzione dal disco;
+					\item aggiornamento della tabella delle pagine e di altre tabelle per segnalare che la pagina richiesta è attualmente presente in memoria;
+					\item attesa che la CPU sia nuovamente assegnata a questo processo;
+					\item ripristino dei registri utente, dello stato del processo e della nuova tabella delle pagine, quindi ripresa dell’istruzione interrotta.
+				\end{enumerate}
+				Non sempre sono necessari tutti i passi sopra elencati. Nel passo 6, per esempio, si ipotizza che la CPU sia assegnata a un altro processo durante un’operazione di I/O. Tale possibilità permette la multiprogrammazione per mantenere occupata la CPU, ma una volta completato il trasferimento di I/o implica un dispendio di tempo per riprendere la procedura di servizio dell’eccezione di page fault.
+				\\In ogni caso, il tempo di servizio dell’eccezione di page fault ha tre componenti:
+				\begin{itemize}
+					\item servizio del segnale di eccezione di page fault;
+					\item lettura della pagina da disco;
+					\item riavvio del processo.
+				\end{itemize}
+				La prima e la terza operazione si possono ridurre, per mezzo di un’accurata codifica, ad alcune centinaia di istruzioni. Ciascuna di queste operazioni può quindi richiedere da 1 a 100 microsecondi. D’altra parte, il tempo di trasferimento di pagina è probabilmente vicino a 8 ms (un disco ha in genere un tempo di latenza di 3 ms, un tempo di posizionamento di 5 ms e un tempo di trasferimento di 0,05 ms, quindi il tempo totale della paginazione è dell’ordine di 8 ms, comprendendo le tempistiche hardware e software). Inoltre nel calcolo si è considerato solo il tempo di servizio del dispositivo. Se una coda di processi è in attesa del dispositivo è necessario considerare anche il tempo di accodamento del dispositivo, poiché occorre attendere che il dispositivo di paginazione sia libero per servire la richiesta, quindi il tempo di trasferimento aumenta ulteriormente.
+				\newpage
+				\noindent Considerando un tempo medio di servizio dell’eccezione di page fault di 8 ms e un tempo d’accesso alla memoria di 200 ns, il \textbf{tempo effettivo d’accesso} (\textbf{EAT}) in ns è il seguente:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1.2cm,keepaspectratio]{ch9_29.png}}
+				\end{figure}
+				\\Il tempo d’accesso effettivo è direttamente proporzionale al tasso di page fault (\textbf{page-fault rate}). Se un accesso su 1000 accusa un page fault, il tempo d’accesso effettivo è di 8,2 microsecondi. Impiegando la paginazione su richiesta, il calcolatore è
+				rallentato di un fattore pari a 40! Se si desidera un rallentamento inferiore al 10 per cento, occorre contenere la probabilità di page fault al seguente livello:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1.3cm,keepaspectratio]{ch9_30.png}}
+				\end{figure}
+				\\Quindi, per mantenere a un livello ragionevole il rallentamento dovuto alla paginazione, si può permettere meno di un page fault ogni 399.990 accessi alla memoria. In un sistema con paginazione su richiesta, è cioè importante tenere basso il tasso di page fault, altrimenti il tempo effettivo d’accesso aumenta, rallentando molto l’esecuzione del processo.
+				\\Un altro aspetto della paginazione su richiesta è la gestione e l’uso generale dell’area di swap. L’I/O di un disco relativo all’area di swap è generalmente più rapido di quello relativo al file system : ciò si deve al fatto che lo spazio di swap è allocato in blocchi molto grandi e non vengono utilizzate ricerche e riferimenti indiretti. Perciò il sistema può migliorare l’efficienza della paginazione copiando tutta
+				l’immagine di un file nell’area di swap all’avvio del processo e di lì eseguire la paginazione su richiesta. Un’altra possibilità consiste nel richiedere inizialmente le pagine al file system, ma scrivere le pagine nell’area di swap al momento della sostituzione. Questo metodo assicura che si leggano sempre dal file system solo le pagine necessarie, ma che tutta la paginazione successiva sia fatta dall’area di swap.
+				\\Alcuni sistemi tentano di limitare l’area di swap utilizzata per file binari: le pagine richieste per questi file si prelevano direttamente dal file system; tuttavia, quando è richiesta una sostituzione di pagine, i frame possono semplicemente essere sovrascritti, dato che non sono mai stati modificati, e le pagine, se è necessario, possono
+				essere nuovamente lette dal file system. Seguendo questo criterio, lo stesso file system funziona da memoria ausiliaria (backing store). L’area di swap si deve in ogni caso usare per le pagine che non sono relative ai file (la cosiddetta memoria anonima); queste comprendono lo stack e lo heap di un processo. Questa tecnica che sembra essere un buon compromesso si usa in diversi sistemi tra cui Solaris e UNIX BSD.
+				\\I sistemi operativi mobili non supportano, in genere, lo swapping, ma, in caso di carenza di memoria, richiedono pagine al file system e recuperano pagine di sola lettura (come il codice) dalle applicazioni. Se necessario, questi dati possono essere richiesti di nuovo al file system.
+			
+			\subsubsection{Copy-on-Write}
+				Nella precedente subsection si è visto come un processo possa cominciare rapidamente l’esecuzione richiedendo solo la pagina contenente la prima istruzione. La generazione dei processi tramite fork(), però, può inizialmente evitare la paginazione su richiesta per mezzo di una tecnica simile alla condivisione delle pagine, che garantisce la celere generazione dei processi riuscendo anche a minimizzare il numero di nuove pagine allocate al processo appena creato.
+				\\Si ricordi che la chiamata di sistema fork() crea un processo figlio come duplicato del genitore. Nella sua versione originale la fork() creava per il figlio una copia dello spazio d’indirizzi del genitore, duplicando le pagine appartenenti al processo genitore. Considerando che molti processi figli eseguono subito dopo la loro creazione la chiamata di sistema exec(), questa operazione di copiatura può essere inutile. Come alternativa, si può impiegare una tecnica nota come copiatura su scrittura (copy-on-write), il cui funzionamento si fonda sulla condivisone iniziale delle pagine da parte dei processi genitori e dei processi figli. Le pagine condivise si contrassegnano come pagine copy-on-write, a significare che, se un processo (genitore o figlio) scrive su una pagina condivisa, il sistema deve creare una copia di tale pagina. 
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=3.2cm,keepaspectratio]{ch9_31.png}}
+				\end{figure}
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=3.7cm,keepaspectratio]{ch9_32.png}}
+				\end{figure}
+				Si noti inoltre che soltanto le pagine modificabili si devono contrassegnare come copy-on write, mentre
+				quelle che non si possono modificare (per esempio, le pagine contenenti codice eseguibile) sono condivisibili dai processi genitore e figlio.
+				\\Quando è necessaria la duplicazione di una pagina secondo la tecnica di copy-on-write, è importante capire da dove si attingerà la pagina libera necessaria. Molti SO forniscono, per queste richieste, un gruppo (pool) di pagine libere, che di solito si assegnano quando lo stack o lo heap di un processo devono espandersi, oppure proprio per gestire pagine da copiare su scrittura. L’allocazione di queste pagine di solito avviene secondo una tecnica nota come azzeramento su richiesta (\textbf{zero-fill-on-demand}); prima dell’allocazione si riempiono di zeri le pagine, cancellandone in questo modo tutto il contenuto precedente.
+				\\Diverse versioni di UNIX (compreso Solaris e Linux) offrono anche una variante della chiamata di sistema fork() detta vfork() (per virtual memory fork). La vfork() offre un’alternativa all’uso della fork() con copiatura su scrittura. Con la vfork() il processo genitore viene sospeso e il processo figlio usa lo spazio d’indirizzi del genitore. Poiché la vfork() non usa la copiatura su scrittura, se il processo
+				figlio modifica qualche pagina dello spazio d’indirizzi del genitore, le pagine modificate saranno visibili al processo genitore non appena riprenderà il controllo. È quindi necessaria molta attenzione nell’uso di vfork(), per assicurarsi che il processo figlio non modifichi lo spazio d’indirizzi del genitore. La chiamata di sistema vfork() è adatta al caso in cui il processo figlio esegua una exec() immediatamente dopo la sua creazione. Poiché non richiede alcuna copiatura delle pagine, la vfork() è un metodo di creazione dei processi molto efficiente, in alcuni casi impiegato per realizzare le interfacce shell in UNIX.
+
+		\subsection{Sostituzione delle Pagine}
+			Nelle descrizioni fatte finora sul tasso di page fault abbiamo supposto che ogni pagina poteva dar luogo al massimo a un fault, la prima volta in cui si effettuava un riferimento a essa. Tale rappresentazione tuttavia non è molto precisa. Se un processo di 10 pagine ne impiega effettivamente solo la metà, la paginazione su richiesta fa risparmiare l’I/O necessario per caricare le cinque pagine che non sono mai usate. Inoltre il grado di multiprogrammazione potrebbe essere aumentato eseguendo il doppio dei processi. Aumentando il grado di multiprogrammazione, si sovrassegna la memoria perché, nel caso i processi richiedano ulteriori pagine, la RAM potrebbe non essere sufficiente.
+			\\Si consideri inoltre che la memoria del sistema non si usa solo per contenere pagine di programmi: le aree di memoria per l’I/O impegnano una rilevante quantità di memoria. Ciò può aumentare le difficoltà agli algoritmi di allocazione della memoria. Decidere quanta memoria assegnare all’I/O e quanta alle pagine dei programmi è un problema complesso. Alcuni sistemi riservano una quota fissa di memoria per l’I/o, altri permettono sia ai processi utenti sia al sottosistema di I/o di competere per tutta la memoria del sistema.
+			\\La \textbf{sovrallocazione} (\textbf{over-allocation}) si può illustrare come segue. Durante l’esecuzione di un processo utente si verifica un page fault. Il SO determina la locazione del disco in cui risiede la pagina desiderata, ma poi scopre che la lista dei frame liberi è vuota: tutta la memoria è in uso. 
+			\begin{figure}[ht!]
+				\centering{\includegraphics[width=12cm,height=3.7cm,keepaspectratio]{ch9_33.png}}
+			\end{figure}
+			\\A questo punto il SO può scegliere tra diverse possibilità, per esempio può terminare il processo utente. Tuttavia, la paginazione su richiesta è un tentativo che il SO fa per migliorare l’utilizzo e la produttività del sistema di calcolo. Gli utenti non dovrebbero sapere che i loro processi sono eseguiti su un sistema paginato. La paginazione deve essere logicamente trasparente per l’utente, quindi la terminazione del processo non costituisce la scelta migliore.
+			\\In questa sede analizziamo l’opzione più comune: la \textbf{sostituzione delle pagine} (\textbf{page replacement}).
+
+			\subsubsection{Page Replacement}
+				La sostituzione delle pagine segue il seguente criterio: se nessun frame è libero, ne viene liberato uno attualmente inutilizzato. È possibile liberarlo scrivendo il suo contenuto nell’area di swap e modificando la tabella delle pagine (e tutte le altre tabelle) per indicare che la pagina non si trova più in memoria. 
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.2cm,keepaspectratio]{ch9_34.png}}
+				\end{figure}
+				\\Il frame liberato si può usare per memorizzare la pagina che ha causato il fault. Si modifica la procedura di servizio dell’eccezione di page fault in modo da includere la sostituzione della pagina:
+				\begin{enumerate}
+					\item s’individua la locazione su disco della pagina richiesta;
+					\item si cerca un frame libero:
+					\begin{enumerate}
+						\item se esiste, lo si usa;
+						\item altrimenti si impiega un algoritmo di sostituzione delle pagine per scegliere un frame vittima;
+						\item si scrive la pagina “vittima” nel disco; si di conseguenza le tabelle delle pagine e quelle dei frame;
+					\end{enumerate}
+					\item si scrive la pagina richiesta nel frame appena liberato; si modificano le tabelle delle pagine e dei frame;
+					\item si riprende il processo utente dal punto in cui si è verificato il page fault.
+				\end{enumerate}
+				Occorre notare che, se non esiste alcun frame libero sono necessari due trasferimenti di pagine, uno fuori e uno dentro la memoria. Questa situazione raddoppia il tempo di servizio del page fault e aumenta di conseguenza anche il tempo effettivo d’accesso.
+				\\Questo sovraccarico si può ridurre usando un bit di modifica (modify bit o dirty bit). In questo caso l’hardware del calcolatore dispone di un bit di modifica, associato a ogni pagina (o frame), che viene posto a 1 ogni volta che nella pagina si scrive un byte, indicando che la pagina è stata modificata. Quando si sceglie una pagina da sostituire si esamina il suo bit di modifica; se è a 1, significa che quella pagina è stata modificata rispetto a quando era stata letta dal disco; in questo caso la pagina deve essere scritta nel disco. Se il bit di modifica è rimasto a 0, significa che la pagina non è stata modificata da quando è stata caricata in memoria, quindi non è necessario scrivere nel disco la pagina di memoria: c’è già. Questa tecnica vale anche per le pagine di sola lettura, per esempio pagine di codice binario. Queste pagine non possono essere modificate, quindi si possono rimuovere in ogni momento. Questo schema può ridurre in modo considerevole il tempo per il servizio del page fault, poiché dimezza il tempo di I/o, se la pagina non è stata modificata.
+				\\La sostituzione di una pagina è fondamentale al fine della paginazione su richiesta, perché completa la separazione tra memoria logica e memoria fisica. Con questo meccanismo si può mettere a disposizione dei programmatori una memoria virtuale enorme con una memoria fisica più piccola. Senza la paginazione su richiesta, gli indirizzi utente si fanno corrispondere a indirizzi fisici e i due insiemi di indirizzi possono essere diversi. Tuttavia tutte le pagine di un processo devono ancora essere in memoria fisica. Con la paginazione su richiesta la dimensione dello spazio degli indirizzi logici non è più limitata dalla memoria fisica. Per esempio, un processo utente formato da 20 pagine si può eseguire in 10 frame semplicemente usando la paginazione su richiesta e un algoritmo di sostituzione per localizzare un frame libero ogni qual volta
+				sia necessario. Se una pagina modificata deve essere sostituita, si copia nel disco il suo contenuto. Un successivo riferimento a quella pagina causa un’eccezione di page fault. In quel momento, la pagina viene riportata in memoria, eventualmente sostituendo un’altra pagina.
+				Per realizzare la paginazione su richiesta è necessario risolvere due problemi principali: occorre sviluppare un algoritmo di allocazione dei frame e un algoritmo di sostituzione delle pagine. ossia, se sono presenti più processi in memoria, occorre decidere quanti frame vadano assegnati a ciascun processo. Inoltre, quando è richiesta una sostituzione di pagina, occorre selezionare i frame da sostituire. La progettazione di algoritmi idonei a risolvere questi problemi è un compito importante, poiché l’I/O nei dischi è molto oneroso. Anche miglioramenti minimi ai metodi di paginazione su richiesta apportano notevoli incrementi alle prestazioni del sistema.
+				\\Esistono molti algoritmi di sostituzione delle pagine; probabilmente ogni sistema operativo ha il proprio schema di sostituzione. È quindi necessario stabilire un criterio per selezionare un algoritmo di sostituzione particolare; comunemente si sceglie quello con il minimo tasso di page fault.
+				\\Un algoritmo si valuta effettuandone l’esecuzione su una particolare successione di riferimenti alla memoria e calcolando il numero di page fault. La successione dei riferimenti alla memoria è detta, appunto, successione dei riferimenti. Queste successioni si possono generare artificialmente (per esempio con un generatore di numeri casuali), oppure analizzando un dato sistema e registrando l’indirizzo di ciascun riferimento alla memoria. Quest’ultima opzione genera un numero elevato di dati, dell’ordine di un milione di indirizzi al secondo. Per ridurre questa quantità di dati occorre notare due fatti.
+				\\Innanzitutto, per una pagina di dimensioni date, generalmente fissate dall’architettura del sistema, si considera solo il numero della pagina anziché l’intero indirizzo. In secondo luogo, se si ha un riferimento a una pagina p, i riferimenti alla stessa pagina immediatamente successivi al primo non generano page fault: dopo il primo riferimento, la pagina p è presente in memoria.
+				\\Esaminando un processo si potrebbe per esempio registrare la seguente successione di indirizzi:
+				\begin{center}
+					0100, 0432, 0101, 0612, 0102, 0103, 0104, 0101, 0611, 0102, 0103,
+					0104, 0101, 0610, 0102, 0103, 0104, 0101, 0609, 0102, 0105
+				\end{center}
+				che, a 100 byte per pagina, si riduce alla seguente successione di riferimenti:
+				\begin{center}
+					1, 4, 1, 6, 1, 6, 1, 6, 1, 6, 1
+				\end{center}
+				Per stabilire il numero di page fault relativo a una particolare successione di riferimenti e a un particolare algoritmo di sostituzione delle pagine, occorre conoscere anche il numero dei frame disponibili. Naturalmente, aumentando il numero di quest’ultimi diminuisce il numero di page fault. Per la successione dei riferimenti precedentemente esaminata, per esempio, dati tre o più blocchi di memoria avremmo solo tre fault: uno per il primo riferimento di ogni pagina. D’altra parte, se si dispone di un solo frame è necessaria una sostituzione per ogni riferimento, con il risultato di 11 page fault. In generale ci si aspetta una curva simile ala seguente:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.2cm,keepaspectratio]{ch9_35.png}}
+				\end{figure}
+				\\Aumentando il numero dei frame, il numero di page fault diminuisce fino al livello minimo. Naturalmente aggiungendo memoria fisica il numero dei frame aumenta.
+				\\Per illustrare gli algoritmi di sostituzione delle pagine impiegheremo la seguente successione di riferimenti:
+				\begin{center}
+					7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1
+				\end{center}
+				per una memoria con tre frame.
 \end{document}
