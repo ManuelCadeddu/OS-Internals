@@ -32,3 +32,12 @@
 \contentsline {subsubsection}{\numberline {2.2.4}Copy-on-Write}{29}{}%
 \contentsline {subsection}{\numberline {2.3}Sostituzione delle Pagine}{30}{}%
 \contentsline {subsubsection}{\numberline {2.3.1}Page Replacement}{31}{}%
+\contentsline {subsubsection}{\numberline {2.3.2}Page Replacement Strategies}{34}{}%
+\contentsline {subsubsection}{\numberline {2.3.3}FIFO Page Replacement}{35}{}%
+\contentsline {subsubsection}{\numberline {2.3.4}Algoritmo Ottimale di Page Replacement}{36}{}%
+\contentsline {subsubsection}{\numberline {2.3.5}LRU Page Replacement}{36}{}%
+\contentsline {subsubsection}{\numberline {2.3.6}LRU Approximation Algorithms}{39}{}%
+\contentsline {paragraph}{\numberline {2.3.6.1}Additional-Reference-Bits Algorithm\\}{39}{}%
+\contentsline {paragraph}{\numberline {2.3.6.2}Algoritmo con Seconda Chance\\}{39}{}%
+\contentsline {paragraph}{\numberline {2.3.6.3}Algoritmo con Seconda Chance Migliorato\\}{40}{}%
+\contentsline {subsubsection}{\numberline {2.3.7}Counting Algotithms}{41}{}%

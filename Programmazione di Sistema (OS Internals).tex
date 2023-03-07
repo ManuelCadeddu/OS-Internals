@@ -13,6 +13,8 @@
 
 \begin{document}
 	\pagenumbering{arabic}
+	\setcounter{tocdepth}{4}
+	\setcounter{secnumdepth}{4}
 	\maketitle
 	\newpage
 	\doublespacing
@@ -457,4 +459,115 @@
 					7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1
 				\end{center}
 				per una memoria con tre frame.
+
+			\subsubsection{Page Replacement Strategies}
+				La frequenza dei page fault (numero di page fault sul numero totale di access) può essere espressa con la seguente formula:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=1cm,keepaspectratio]{ch9_36.png}}
+				\end{figure}
+				\begin{itemize}
+					\item \textbf{A}: algoritmo di page replacement;
+					\item \textbf{m}: numero di frame disponibili (fisso e dedicato ad un dato processo);
+					\item \textbf{p(w)}: probabilità che si debba accedere alla stringa di riferimento \textit{w};
+					\item \textbf{F(A,m,w)}: numero di page fault generato da una certa stringa di riferimento \textit{w} usando un  algoritmo \textit{A} in un sistema con \textit{m} frame;
+					\item \textbf{len(w)}: lunghezza della stringa di riferimento \textit{w}.
+				\end{itemize}
+				Come possiamo vedere dal seguente grafico, se ci sono pochi frame liberi, il tasso di page faul è alto. Se si hanno tanti frame la frequenza diminuisce, fino ad azzerarsi quando il numero di frame liberi è uguale a quello delle pagine del processo.
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_37.png}}
+				\end{figure}
+				\\Inoltre, possiamo notare che più l'algoritmo è stupido (la vittima da spostare viene scelta casualmente), più il grafico assomiglia a una retta.
+
+			\subsubsection{FIFO Page Replacement}
+				L’algoritmo di sostituzione delle pagine più semplice è un algoritmo FIFO: si crea una cosa FIFO in base all'ordine di arrivo delle pagine caricate in memoria e, se si deve sostituire una pagina, si seleziona quella presente in memoria da più tempo. Occorre notare che non è strettamente necessario registrare l’istante in cui si carica una pagina in memoria; infatti si può creare una coda FIFO di tutte le pagine presenti in memoria. In questo caso si sostituisce la pagina che si trova in testa alla coda. Quando si carica una pagina in memoria, la si inserisce nell’ultimo elemento della coda.
+				\\Nella successione di riferimenti di esempio, i nostri tre frame sono inizialmente vuoti. I primi tre riferimenti (7, 0, 1) accusano ciascuno un page fault con conseguente caricamento delle relative pagine nei frame vuoti. Il riferimento successivo (2) causa la sostituzione della pagina 7, perché è stata caricata per prima in memoria. Questo processo prosegue come è illustrato:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_38.png}}
+				\end{figure}
+				\\Complessivamente si hanno 15 page fault.
+				\\Questo algoritmo è facile da capire e da programmare; tuttavia la sue prestazioni non sono sempre buone. La pagina sostituita potrebbe essere un modulo di inizializzazione usato molto tempo prima e che non serve più, ma potrebbe anche contenere una variabile molto usata, inizializzata precedentemente, e ancora in uso.
+				\\Occorre notare che anche se si sceglie una pagina da sostituire che è in uso attivo, tutto continua a funzionare correttamente anche se viene rallentata l'esecuzione del processo.
+				\\Per illustrare i problemi che possono insorgere con l’uso di questo algoritmo, si consideri la seguente successione di riferimenti:
+				\begin{center}
+					1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5
+				\end{center}
+				Nella seguente figura è illustrata la curva dei page fault per questa successione di riferimenti in funzione del numero dei frame disponibili:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4cm,keepaspectratio]{ch9_39.png}}
+				\end{figure}
+				\\Occorre notare che il numero dei page fault (10) per quattro frame è maggiore del numero dei page fault (9) per tre frame. Questo inatteso risultato è noto col nome di \textbf{anomalia di Belady}: con alcuni algoritmi di sostituzione delle pagine, il tasso di page fault può aumentare con il numero dei frame assegnati. A prima vista sembra logico supporre che fornendo più memoria a un processo le prestazioni di quest’ultimo migliorino. In alcune delle prime ricerche sperimentali si notò invece che questo presupposto non sempre è vero.
+
+			\subsubsection{Algoritmo Ottimale di Page Replacement}
+				In seguito alla scoperta dell’anomalia di Belady si è ricercato un algoritmo di page replacement ottimale. Tale algoritmo è quello che presenta il tasso minimo di page fault e non presenta mai l’anomalia di Belady. Questo algoritmo è stato chiamato OPT o MIN e consiste semplicemente nel sostituire la pagina che non verrà usata per il periodo di tempo più lungo.
+				\\Per esempio, nella successione dei riferimenti d’esempio, l’algoritmo ottimale di sostituzione delle pagine produce nove page fault:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_40.png}}
+				\end{figure}
+				\\Con sole nove page fault, la sostituzione ottimale risulta assai migliore di quella ottenuta con un algoritmo FIFO, dove i page fault erano 15. Ignorando i primi tre page fault, che si verificano con tutti gli algoritmi, la sostituzione ottimale è due volte migliore rispetto all’algoritmo FIFO; nessun algoritmo di sostituzione può gestire questa successione di riferimenti a tre blocchi di memoria con meno di nove page fault.
+				\\Sfortunatamente l’algoritmo ottimale di sostituzione delle pagine è difficile da realizzare, perché richiede la conoscenza futura della successione dei riferimenti.
+
+			\subsubsection{LRU Page Replacement}
+				Se l’algoritmo ottimale non è realizzabile, è forse possibile realizzarne un’approssimazione. La distinzione fondamentale tra gli algoritmi FIFO e OPT, oltre quella di guardare avanti o indietro nel tempo, consiste nel fatto che l’algoritmo FIFO impiega l’istante in cui una pagina è stata caricata in memoria, mentre l’algoritmo OPT impiega l’istante in cui una pagina sarà usata. Usando come approssimazione di un futuro vicino un passato recente, si sostituisce la pagina che non è stata usata per il periodo più lungo. Il metodo appena descritto è noto come algoritmo LRU (Least Recently Used).
+				\\La sostituzione LRU associa a ogni pagina l’istante in cui è stata usata per l’ultima volta. Quando occorre sostituire una pagina, l’algoritmo sceglie quella che non è stata usata per il periodo più lungo. Possiamo interpretare questa strategia come l’algoritmo ottimale di sostituzione delle pagine con ricerca all’indietro nel tempo, anziché in avanti.
+				\\Il risultato dell’applicazione dell’algoritmo LRU alla successione dei riferimenti dell’esempio è la seguente:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_41.png}}
+				\end{figure}
+				\\L’algoritmo LRU produce 12 page fault, meglio della sostituzione FIFO (15).
+				\\Vediamo un esempio più dettagliato:
+				\begin{figure}[ht!]
+					\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_43.png}}
+				\end{figure}
+				\begin{itemize}
+					\item \textbf{time}: tempo di accesso;
+					\item \textbf{string}: stringa di riferimento;
+				\end{itemize}
+				Il criterio LRU si usa spesso come algoritmo di sostituzione delle pagine ed è considerato valido. Il problema principale riguarda la sua implementazione perché può richiedere una notevole assistenza da parte dell’hardware. Il problema consiste nel determinare un ordine per i frame definito dal momento dell’ultimo uso. Si possono realizzare le due seguenti soluzioni:
+				\begin{itemize}
+					\item \textbf{contatori}: nel caso più semplice, a ogni elemento della tabella delle pagine si associa un campo \textit{momento di utilizzo}, e alla CPU si aggiunge un contatore che si incrementa a ogni riferimento alla memoria. Ogni volta che si fa un riferimento a una pagina, si copia il contenuto del registro contatore nel campo \textit{momento di utilizzo} nella voce della page table relativa a quella pagina. Si sostituisce la pagina con il valore associato più piccolo. Questo schema implica una ricerca all’interno della tabella delle pagine per individuare la pagina usata meno recentemente, e una scrittura in memoria (nel campo \textit{momento di utilizzo} della tabella delle pagine) per ogni accesso alla memoria. I riferimenti temporali si devono mantenere anche quando, a seguito dello scheduling della CPU, si modificano le tabelle delle pagine. Occorre infine considerare l’overflow del contatore;
+					\item \textbf{stack}: un altro metodo per la realizzazione della sostituzione delle pagine LRU prevede l’utilizzo di uno stack dei numeri delle pagine. Ogni volta che si fa un riferimento a una pagina, la si estrae dallo stack e la si colloca in cima a quest’ultimo. In questo modo, in cima allo stack si trova sempre la pagina usata per ultima, mentre in fondo si trova la pagina usata meno recentemente:
+					\begin{figure}[ht!]
+						\centering{\includegraphics[width=12cm,height=4.4cm,keepaspectratio]{ch9_42.png}}
+					\end{figure}
+					\\Poiché gli elementi si devono estrarre dal centro dello stack, la migliore realizzazione si ottiene usando una lista doppiamente concatenata, con un puntatore all’elemento iniziale e uno a quello finale. Per estrarre una pagina dallo stack e collocarla in cima, nel caso peggiore è necessario modificare sei puntatori. Ogni aggiornamento è un po’ più costoso, ma per una sostituzione non si deve compiere alcuna ricerca: il puntatore dell’elemento di coda punta alla pagina LRU.
+				\end{itemize}
+				Né la sostituzione ottimale né quella LRU sono soggette all’anomalia di Belady. Entrambe appartengono a una classe di algoritmi di sostituzione delle pagine, chiamati \textbf{algoritmi a stack}, che non presenta l’anomalia di Belady. Un algoritmo a stack è un algoritmo per il quale è possibile mostrare che l’insieme delle pagine in memoria per \textit{n} frame è sempre un sottoinsieme dell’insieme delle pagine che dovrebbero essere in memoria per n + 1 frame. Per la sostituzione LRU, l’insieme di pagine in memoria è costituito delle \textit{n} pagine cui si è fatto riferimento più recentemente. Se il numero dei frame è aumentato, queste \textit{n} pagine continuano a essere quelle cui si è fatto riferimento più recentemente e quindi restano in memoria.
+
+			\subsubsection{LRU Approximation Algorithms}
+				Sono pochi i sistemi di calcolo che dispongono del supporto hardware per una vera sostituzione LRU delle pagine. Nei sistemi che non offrono alcun supporto hardware si devono impiegare altri algoritmi di sostituzione delle pagine, per esempio l’algoritmo FIFO. Molti sistemi tuttavia possono fornire un aiuto: un \textbf{bit di riferimento}. Il bit di riferimento a una pagina è impostato automaticamente dall’hardware ogni volta che si fa un riferimento a quella pagina, che sia una lettura o una scrittura su qualsiasi byte della pagina. I bit di riferimento sono associati a ciascun elemento della tabella delle pagine.
+				\\Inizialmente, il SO azzera tutti i bit. Quando s’inizia l’esecuzione di un processo utente, l’hardware imposta a 1 il bit associato a ciascuna pagina cui si fa riferimento. Dopo qualche tempo è possibile stabilire quali pagine sono state usate semplicemente esaminando i bit di riferimento. Non è però possibile conoscere l’ordine d’uso. Questa informazione è alla base di molti algoritmi per la sostituzione delle pagine che approssimano LRU.
+
+				\paragraph{Additional-Reference-Bits Algorithm\\}
+					Ulteriori informazioni sull’ordinamento si possono ottenere registrando i bit di riferimento a intervalli regolari. È possibile conservare in una tabella in memoria con, ad esempio, un byte per ogni pagina. A intervalli regolari, per esempio di 100 millisecondi, un segnale d’interruzione del timer trasferisce il controllo al SO. Questo inserisce il bit di riferimento per ciascuna pagina nel bit più significativo del byte, shiftando gli altri bit a destra di 1 bit e scartando il bit meno significativo.
+					\\Questi registri a scorrimento di 8 bit contengono la storia dell’utilizzo delle pagine relativo agli ultimi otto periodi di tempo. Se il registro a scorrimento contiene la successione di bit 00000000, significa che la pagina associata non è stata usata da otto periodi di tempo; a una pagina usata almeno una volta per ogni periodo corrisponde la successione 11111111 nel registro a scorrimento. Una pagina cui corrisponde la successione 11000100, è stata usata più recentemente di una pagina a cui corrisponde 01110111. Interpretando queste successioni di bit come interi senza segno, la pagina cui è associato il numero minore è la pagina LRU, e può essere sostituita. Si noti che l’unicità dei numeri non è garantita. Si possono sostituire tutte le pagine con il valore minore, oppure si può ricorrere a una selezione FIFO.
+					\\Il numero dei bit può ovviamente essere variato: si sceglie secondo l’hardware disponibile per accelerarne al massimo la modifica. Nel caso limite tale numero si riduce a zero, lasciando soltanto il bit di riferimento. In questo caso l’algoritmo è noto come \textit{algoritmo di sostituzione delle pagine con seconda chance}.
+
+				\paragraph{Algoritmo con Seconda Chance\\}
+					L’algoritmo di base per la sostituzione con seconda chance è un algoritmo di sostituzione di tipo FIFO. Tuttavia, dopo aver selezionato una pagina, si controlla il bit di riferimento: se il suo valore è 0, si sostituisce la pagina; se è impostato a 1, si dà una seconda chance alla pagina e si passa alla successiva pagina FIFO.
+					\\Quando una pagina riceve la seconda chance, si azzera il suo bit di riferimento e si aggiorna il suo istante d’arrivo al momento attuale. In questo modo, una pagina cui si offre una seconda chance non viene mai sostituita fiché tutte le altre pagine non siano state sostituite, oppure non sia stata data loro una seconda chance. Inoltre, se una pagina è usata abbastanza spesso, da mantenere il suo bit di riferimento impostato a 1, non viene mai sostituita.
+					\\Un metodo per implementare l’algoritmo con seconda chance, detto anche a orologio (\textbf{clock}), è basato sull’uso di una coda circolare, in cui un puntatore (lancetta) indica qual è la prima pagina da sostituire. Quando serve un frame, si fa avanzare il puntatore finché non si trovi in corrispondenza di una pagina con il bit di riferimento 0; a ogni passo si azzera il bit di riferimento appena esaminato:
+					\begin{figure}[ht!]
+						\centering{\includegraphics[width=12cm,height=5cm,keepaspectratio]{ch9_44.png}}
+					\end{figure}
+					\\Una volta trovata una pagina “vittima”, la si sostituisce e si inserisce la nuova pagina nella oda circolare nella posizione corrispondente. Si noti che nel caso peggiore, quando tutti i bit sono impostati a 1, il puntatore percorre un ciclo su tutta la coda, dando a ogni pagina una seconda chance. Prima di selezionare la pagina da sostituire, azzera tutti i bit di riferimento. Se tutti i bit sono a 1, la sostituzione con seconda chance si riduce a una sostituzione FIFO.
+			
+				\paragraph{Algoritmo con Seconda Chance Migliorato\\}
+					L’algoritmo con seconda chance descritto precedentemente si può migliorare considerando i bit di riferimento e di modifica come una coppia ordinata, con cui si possono ottenere le seguenti quattro classi:
+					\begin{enumerate}
+						\item (0, 0) né recentemente usato né modificato – migliore pagina da sostituire;
+						\item (0, 1) non usato recentemente, ma modificato – la pagina non così buona poiché prima di essere sostituita deve essere scritta in memoria secondaria;
+						\item (1, 0) usato recentemente ma non modificato – probabilmente la pagina sarà presto usata nuovamente;
+						\item (1, 1) usato recentemente e modificato – probabilmente la pagina sarà presto ancora usata e dovrà essere scritta in memoria secondaria prima di essere sostituita.
+					\end{enumerate}
+					Ogni pagina rientra in una di queste quattro classi. Alla richiesta di una sostituzione di pagina, si usa lo stesso schema impiegato nell’algoritmo a orologio, ma anziché controllare se la pagina puntata ha il bit di riferimento impostato a 1, si esamina la classe a cui la pagina appartiene e si sostituisce la prima pagina che si trova nella classe minima non vuota. Si noti che si può dover scandire la coda circolare più volte prima di trovare una pagina da sostituire.
+					\\La differenza principale tra questo algoritmo e il più semplice algoritmo a orologio è che qui si dà la preferenza alle pagine modificate, al fine di ridurre il numero di I/ richiesti.
+
+			\subsubsection{Counting Algotithms}
+				Esistono molti altri algoritmi che si possono usare per la sostituzione delle pagine. Per esempio, si potrebbe usare un contatore del numero dei riferimenti fatti a ciascuna pagina, e sviluppare i due seguenti schemi:
+				\begin{itemize}
+					\item algoritmo di sostituzione delle pagine meno frequentemente usate (\textbf{Least Frequently Used}, \textbf{LFU}): richiede che si sostituisca la pagina con il conteggio più basso. La ragione di questa scelta è che una pagina usata attivamente deve avere un conteggio di riferimento alto. Si ha però un problema quando una pagina è usata molto intensamente durante la fase iniziale di un processo, ma poi non viene più usata. Poiché è stata usata intensamente il suo conteggio è alto, quindi rimane in memoria anche se non è più necessaria. Una soluzione può essere quella di spostare i valori dei contatori a destra di un bit a intervalli regolari, misurando l’utilizzo con un peso esponenziale decrescente;
+					\item algoritmo di sostituzione delle pagine più frequentemente usate (\textbf{Most Frequently Used}, \textbf{MFU}); è basato sul fatto che, probabilmente, la pagina con il contatore più basso è stata appena inserita e non è stata ancora usata.
+				\end{itemize}
+				Le sostituzioni MFU e LFU non sono molto comuni, poiché la realizzazione di questi algoritmi è abbastanza onerosa; inoltre, tali algoritmi non approssimano bene la sostituzione OPT.
+
 \end{document}
